@@ -58,14 +58,13 @@ const commentSchema = new mongoose.Schema(
 );
 
 // auto-generate hash before saving to deduplicate
-commentSchema.pre('save', function (next) {
+commentSchema.pre('save', function () {
   if (!this.hash) {
     this.hash = crypto
       .createHash('md5')
       .update(this.text + this.billId.toString())
       .digest('hex');
   }
-  next();
 });
 
 module.exports = mongoose.model('Comment', commentSchema);

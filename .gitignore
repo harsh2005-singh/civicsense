@@ -165,3 +165,6 @@ Thumbs.db
 # VS Code
 # ========================
 .vscode/
+
+uploads/
+!uploads/.gitkeep
