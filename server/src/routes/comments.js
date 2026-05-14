@@ -5,7 +5,7 @@ const fs = require('fs');
 const Comment = require('../models/Comment');
 const Bill = require('../models/Bill');
 const { verifyToken } = require('../middleware/auth');
-//const { addToQueue } = require('../workers/commentQueue');
+const { addToQueue } = require('../workers/commentQueue');
 
 // multer config — save CSV to /uploads folder temporarily
 const upload = multer({ dest: 'uploads/' });
@@ -51,10 +51,9 @@ router.post('/', verifyToken, async (req, res) => {
     });
 
     // add to Bull queue for AI processing
-    // if (insertedIds.length > 0) {
-    //   await addToQueue({ commentIds: insertedIds, billId });
-    // }
-    console.log('Queue disabled until Redis is running');
+    if (insertedIds.length > 0) {
+     await addToQueue({ commentIds: insertedIds, billId });
+  }
 
     res.status(201).json({
       message: 'Comments submitted',
