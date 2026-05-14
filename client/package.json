@@ -21,7 +21,8 @@
     "react-router-dom": "^7.15.0",
     "react-wordcloud": "^1.2.7",
     "recharts": "^3.8.1",
-    "tailwindcss": "^4.3.0"
+    "tailwindcss": "^4.3.0",
+    "tippy.js": "^6.3.7"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
