@@ -7,6 +7,7 @@ import Bills from './pages/Bills'
 import Submit from './pages/Submit'
 import Analysis from './pages/Analysis'
 import NotFound from './pages/NotFound'
+import Admin from './pages/Admin'
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="/submit"  element={<ProtectedRoute><Submit /></ProtectedRoute>} />
         <Route path="/analysis" element={<ProtectedRoute><Analysis /></ProtectedRoute>} />
         <Route path="*"        element={<NotFound />} />
+        <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   )

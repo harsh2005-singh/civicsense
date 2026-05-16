@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import { useBills, useSentiment, useKeywords, useSummary, useComments } from '../api/hooks'
 import SentimentCharts from '../components/SentimentCharts'
@@ -7,7 +8,9 @@ import SummaryPanel from '../components/SummaryPanel'
 import CommentsTable from '../components/CommentsTable'
 
 export default function Analysis() {
-  const [selectedBill, setSelectedBill] = useState('')
+  const [searchParams] = useSearchParams()
+  const [selectedBill, setSelectedBill] = useState(searchParams.get('billId') || '')
+
   const { data: billsData } = useBills()
   const bills = billsData?.bills || []
 
@@ -24,23 +27,37 @@ export default function Analysis() {
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-6 py-8">
+
+        {/* top bar with selector + PDF button */}
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-slate-800">Analysis</h1>
             <p className="text-slate-500 mt-1">AI-generated insights per bill</p>
           </div>
+          <div className="flex items-center gap-3">
+            <select
+              value={selectedBill}
+              onChange={e => setSelectedBill(e.target.value)}
+              className="px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white min-w-64"
+            >
+              <option value="">-- Select a bill to analyze --</option>
+              {bills.map(b => (
+                <option key={b._id} value={b._id}>{b.title}</option>
+              ))}
+            </select>
 
-          {/* bill selector */}
-          <select
-            value={selectedBill}
-            onChange={e => setSelectedBill(e.target.value)}
-            className="px-4 py-2.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white min-w-64"
-          >
-            <option value="">-- Select a bill to analyze --</option>
-            {bills.map(b => (
-              <option key={b._id} value={b._id}>{b.title}</option>
-            ))}
-          </select>
+            {selectedBill && (
+              <button
+                onClick={() => {
+                  const token = localStorage.getItem('token')
+                  window.open(`http://localhost:3001/api/reports/export?billId=${selectedBill}&token=${token}`, '_blank')
+                }}
+                className="bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+              >
+                ⬇ Download PDF
+              </button>
+            )}
+          </div>
         </div>
 
         {!selectedBill && (
@@ -53,7 +70,6 @@ export default function Analysis() {
 
         {selectedBill && (
           <>
-            {/* stat bar */}
             <div className="grid grid-cols-4 gap-4 mb-6">
               {[
                 { label: 'Total Comments', value: comments.length, color: 'bg-blue-600' },
@@ -73,13 +89,11 @@ export default function Analysis() {
               ))}
             </div>
 
-            {/* charts row */}
             <div className="grid grid-cols-2 gap-6 mb-6">
               <SentimentCharts data={sentimentData} loading={loadingSentiment} />
               <WordCloudView data={keywordsData} loading={loadingKeywords} />
             </div>
 
-            {/* summary + comments */}
             <div className="grid grid-cols-5 gap-6 mb-6">
               <div className="col-span-2">
                 <SummaryPanel data={summaryData} />

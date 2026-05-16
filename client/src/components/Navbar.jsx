@@ -23,6 +23,9 @@ export default function Navbar() {
         <Link to="/bills" className="text-sm text-slate-600 hover:text-blue-600 font-medium">Bills</Link>
         <Link to="/submit" className="text-sm text-slate-600 hover:text-blue-600 font-medium">Submit</Link>
         <Link to="/analysis" className="text-sm text-slate-600 hover:text-blue-600 font-medium">Analysis</Link>
+        {user?.role === 'admin' && (
+          <Link to="/admin" className="text-sm text-red-600 hover:text-red-700 font-medium">Admin</Link>
+        )}
         <span className="text-sm text-slate-400">|</span>
         <span className="text-sm text-slate-500">{user?.name}</span>
         <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full capitalize font-medium">{user?.role}</span>
