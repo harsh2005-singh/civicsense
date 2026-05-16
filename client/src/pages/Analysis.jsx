@@ -6,6 +6,7 @@ import SentimentCharts from '../components/SentimentCharts'
 import WordCloudView from '../components/WordCloudView'
 import SummaryPanel from '../components/SummaryPanel'
 import CommentsTable from '../components/CommentsTable'
+import BillTimeline from '../components/BillTimeline'
 
 export default function Analysis() {
   const [searchParams] = useSearchParams()
@@ -70,6 +71,7 @@ export default function Analysis() {
 
         {selectedBill && (
           <>
+            <BillTimeline billId={selectedBill} />
             <div className="grid grid-cols-4 gap-4 mb-6">
               {[
                 { label: 'Total Comments', value: comments.length, color: 'bg-blue-600' },
@@ -99,7 +101,7 @@ export default function Analysis() {
                 <SummaryPanel data={summaryData} />
               </div>
               <div className="col-span-3">
-                <CommentsTable comments={completedComments} />
+                <CommentsTable comments={completedComments} billId={selectedBill} />
               </div>
             </div>
           </>

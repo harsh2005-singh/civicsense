@@ -65,4 +65,26 @@ router.patch('/:id/status', verifyToken, requireRole('admin', 'analyst'), async 
   }
 });
 
+// PATCH /api/bills/:id/status already exists
+// Add this new GET for timeline
+router.get('/:id/timeline', verifyToken, async (req, res) => {
+  try {
+    const bill = await Bill.findById(req.params.id);
+    if (!bill) return res.status(404).json({ error: 'Bill not found' });
+
+    const allStatuses = ['draft', 'open', 'closed', 'archived'];
+    const currentIndex = allStatuses.indexOf(bill.status);
+
+    const timeline = allStatuses.map((status, i) => ({
+      status,
+      completed: i <= currentIndex,
+      current: i === currentIndex,
+      label: status.charAt(0).toUpperCase() + status.slice(1),
+    }));
+
+    res.json({ timeline, currentStatus: bill.status });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 module.exports = router;

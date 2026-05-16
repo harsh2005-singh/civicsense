@@ -2,6 +2,8 @@ const Bull = require('bull');
 const axios = require('axios');
 const Comment = require('../models/Comment');
 const Bill = require('../models/Bill');
+const { sendAnalysisComplete } = require('../utils/mailer');
+const User = require('../models/User');
 
 const commentQueue = new Bull('comment-processing', {
   redis: process.env.REDIS_URL || 'redis://localhost:6379',
@@ -75,6 +77,24 @@ commentQueue.process(async (job) => {
   }
 
   console.log(`Done processing bill ${billId}`);
+  // send email notification
+  try {
+    const bill2 = await Bill.findById(billId);
+    const creator = await User.findById(bill2.createdBy);
+    if (creator?.email) {
+      const allDone = await Comment.find({ billId, status: 'completed' });
+      const emailStats = { positive: 0, neutral: 0, negative: 0 };
+      allDone.forEach(c => { if (c.sentimentLabel) emailStats[c.sentimentLabel]++ });
+      await sendAnalysisComplete({
+        to: creator.email,
+        billTitle: bill2.title,
+        billNumber: bill2.billNumber,
+        stats: emailStats,
+      });
+    }
+  } catch (e) {
+    console.error('Email notification failed:', e.message);
+  }
 });
 
 commentQueue.on('completed', (job) => {

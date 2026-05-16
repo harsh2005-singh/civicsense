@@ -19,7 +19,7 @@ export default function Navbar() {
         <span className="font-bold text-slate-800 text-lg">CivicSense</span>
       </div>
       <div className="flex items-center gap-4">
-        <Link to="/" className="text-sm text-slate-600 hover:text-blue-600 font-medium">Dashboard</Link>
+        <Link to="/dashboard" className="text-sm text-slate-600 hover:text-blue-600 font-medium">Dashboard</Link>
         <Link to="/bills" className="text-sm text-slate-600 hover:text-blue-600 font-medium">Bills</Link>
         <Link to="/submit" className="text-sm text-slate-600 hover:text-blue-600 font-medium">Submit</Link>
         <Link to="/analysis" className="text-sm text-slate-600 hover:text-blue-600 font-medium">Analysis</Link>

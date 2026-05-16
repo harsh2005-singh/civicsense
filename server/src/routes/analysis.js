@@ -88,4 +88,48 @@ router.get('/summary', verifyToken, async (req, res) => {
   }
 });
 
+// GET /api/analysis/export?billId=X — export comments as CSV
+router.get('/export', verifyToken, async (req, res) => {
+  try {
+    const { billId } = req.query;
+    if (!billId) return res.status(400).json({ error: 'billId is required' });
+
+    const comments = await Comment.find({ billId, status: 'completed' });
+
+    const rows = [
+      ['Text', 'Sentiment', 'Score', 'Keywords', 'Submitted By', 'Date'],
+      ...comments.map(c => [
+        `"${c.text.replace(/"/g, '""')}"`,
+        c.sentimentLabel || '',
+        c.sentimentScore || '',
+        `"${c.keywords.map(k => k.word).join(', ')}"`,
+        c.submittedBy || 'anonymous',
+        new Date(c.createdAt).toLocaleDateString(),
+      ])
+    ];
+
+    const csv = rows.map(r => r.join(',')).join('\n');
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename=comments-${billId}.csv`);
+    res.send(csv);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/analysis/globalstats — for landing page
+router.get('/globalstats', async (req, res) => {
+  try {
+    const Bill = require('../models/Bill');
+    const totalBills = await Bill.countDocuments();
+    const totalComments = await Comment.countDocuments();
+    const analyzed = await Comment.countDocuments({ status: 'completed' });
+    const positive = await Comment.countDocuments({ sentimentLabel: 'positive' });
+    res.json({ totalBills, totalComments, analyzed, positive });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
