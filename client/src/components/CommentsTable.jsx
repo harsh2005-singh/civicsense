@@ -25,7 +25,7 @@ export default function CommentsTable({ comments, billId }) {
 
   const handleExportCSV = () => {
     const token = localStorage.getItem('token')
-    window.open(`http://localhost:3001/api/analysis/export?billId=${billId}&token=${token}`, '_blank')
+    window.open(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/analysis/export?billId=${billId}&token=${token}`, '_blank')
   }
 
   return (
